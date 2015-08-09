@@ -193,7 +193,7 @@ class UEditorAction extends Action
         $end = $start + $size;
 
         /* 获取文件列表 */
-        $path = $_SERVER['DOCUMENT_ROOT'] . (substr($path, 0, 1) == "/" ? "" : "/") . $path;
+        $path = $this->getRootPath() . (substr($path, 0, 1) == "/" ? "" : "/") . $path;
         $files = $this->getfiles($path, $allowFiles);
         if (!count($files)) {
             return json_encode([
@@ -364,7 +364,7 @@ class UEditorAction extends Action
                 } else {
                     if (preg_match("/\.(" . $allowFiles . ")$/i", $file)) {
                         $files[] = [
-                            'url' => substr($path2, strlen($_SERVER['DOCUMENT_ROOT'])),
+                            'url' => str_replace($this->getRootPath(), $this->getRootUrl(), $path2),
                             'mtime' => filemtime($path2)
                         ];
                     }
