@@ -1,9 +1,12 @@
 <?php
 namespace cliff363825\ueditor;
 
-use Yii;
 use yii\web\AssetBundle;
 
+/**
+ * Class UEditorAsset
+ * @package cliff363825\ueditor
+ */
 class UEditorAsset extends AssetBundle
 {
     public $sourcePath = '@cliff363825/ueditor/assets';

@@ -9,6 +9,8 @@ namespace cliff363825\ueditor;
  */
 class Uploader
 {
+    private $rootPath;//文件保存根目录
+    private $rootUrl;//文件保存根url
     private $fileField; //文件域名
     private $file; //文件上传对象
     private $base64; //文件上传对象
@@ -46,10 +48,14 @@ class Uploader
      * 构造函数
      * @param string $fileField 表单名称
      * @param array $config 配置项
-     * @param bool $base64 是否解析base64编码，可省略。若开启，则$fileField代表的是base64编码的字符串表单名
+     * @param string $type 是否解析base64编码，可省略。若开启，则$fileField代表的是base64编码的字符串表单名
+     * @param string $rootPath 文件保存根目录
+     * @param string $rootUrl 文件保存根url
      */
-    public function __construct($fileField, $config, $type = "upload")
+    public function __construct($fileField, $config, $type = "upload", $rootPath = '', $rootUrl = '')
     {
+        $this->rootPath = $rootPath;
+        $this->rootUrl = $rootUrl;
         $this->fileField = $fileField;
         $this->config = $config;
         $this->type = $type;
@@ -70,7 +76,7 @@ class Uploader
      */
     private function upFile()
     {
-        $file = $this->file = $_FILES[$this->fileField];
+        $file = $this->file = !empty($_FILES[$this->fileField]) ? $_FILES[$this->fileField] : array();
         if (!$file) {
             $this->stateInfo = $this->getStateInfo("ERROR_FILE_NOT_FOUND");
             return;
@@ -303,7 +309,7 @@ class Uploader
     private function getFilePath()
     {
         $fullname = $this->fullName;
-        $rootPath = \Yii::getAlias('@webroot');
+        $rootPath = !empty($this->rootPath) ? $this->rootPath : $_SERVER['DOCUMENT_ROOT'];
 
         if (substr($fullname, 0, 1) != '/') {
             $fullname = '/' . $fullname;
@@ -336,9 +342,10 @@ class Uploader
      */
     public function getFileInfo()
     {
+        $rootUrl = !empty($this->rootUrl) ? $this->rootUrl : '';
         return array(
             "state" => $this->stateInfo,
-            "url" => \Yii::getAlias('@web').$this->fullName,
+            "url" => $rootUrl . $this->fullName,
             "title" => $this->fileName,
             "original" => $this->oriName,
             "type" => $this->fileType,

@@ -1187,7 +1187,7 @@ baidu.sio.callByServer = /**@function*/function(url, callback, opt_options) {
     url = url.replace(reg, '\x241' + queryField + '=' + callbackName);
     
     if (url.search(reg) < 0) {
-        url += (url.indexOf('?') == -1 ? '?' : '&') + queryField + '=' + callbackName;
+        url += (url.indexOf('?') < 0 ? '?' : '&') + queryField + '=' + callbackName;
     }
     baidu.sio._createScriptTag(scr, url, charset);
 
