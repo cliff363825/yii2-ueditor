@@ -7,23 +7,23 @@ use yii\base\Action;
 /**
  * Class UEditorAction
  * @package cliff363825\ueditor
- * @property string $rootPath
- * @property string $rootUrl
  */
 class UEditorAction extends Action
 {
     /**
+     * 文件保存根路径
+     * @var string
+     */
+    public $rootPath = '@webroot/uploads';
+    /**
+     * 文件保存根url
+     * @var string
+     */
+    public $rootUrl = '@web/uploads';
+    /**
      * @var array
      */
     public $config = [];
-    /**
-     * @var string
-     */
-    private $_rootPath = '@webroot/uploads';
-    /**
-     * @var string
-     */
-    private $_rootUrl = '@web/uploads';
 
     /**
      * @inheritDoc
@@ -104,6 +104,8 @@ class UEditorAction extends Action
      */
     protected function do_upload()
     {
+        $rootPath = rtrim(Yii::getAlias($this->rootPath), '\\/') . '/';
+        $rootUrl = rtrim(Yii::getAlias($this->rootUrl), '\\/') . '/';
         $CONFIG = $this->config;
         /* 上传配置 */
         $base64 = "upload";
@@ -146,7 +148,7 @@ class UEditorAction extends Action
         }
 
         /* 生成上传实例对象并完成上传 */
-        $up = new Uploader($fieldName, $config, $base64, $this->getRootPath(), $this->getRootUrl());
+        $up = new Uploader($fieldName, $config, $base64, $rootPath, $rootUrl);
 
         /**
          * 得到上传文件所对应的各个参数,数组结构
@@ -193,7 +195,7 @@ class UEditorAction extends Action
         $end = $start + $size;
 
         /* 获取文件列表 */
-        $path = $this->getRootPath() . (substr($path, 0, 1) == "/" ? "" : "/") . $path;
+        $path = rtrim(Yii::getAlias($this->rootPath), '\\/') . '/' . $path;
         $files = $this->getfiles($path, $allowFiles);
         if (!count($files)) {
             return json_encode([
@@ -230,6 +232,8 @@ class UEditorAction extends Action
      */
     protected function do_crawler()
     {
+        $rootPath = rtrim(Yii::getAlias($this->rootPath), '\\/') . '/';
+        $rootUrl = rtrim(Yii::getAlias($this->rootUrl), '\\/') . '/';
         $CONFIG = $this->config;
         /* 上传配置 */
         $config = [
@@ -248,7 +252,7 @@ class UEditorAction extends Action
             $source = $_GET[$fieldName];
         }
         foreach ($source as $imgUrl) {
-            $item = new Uploader($imgUrl, $config, "remote", $this->getRootPath(), $this->getRootUrl());
+            $item = new Uploader($imgUrl, $config, "remote", $rootPath, $rootUrl);
             $info = $item->getFileInfo();
             array_push($list, [
                 "state" => $info["state"],
@@ -353,6 +357,10 @@ class UEditorAction extends Action
      */
     protected function getfiles($path, $allowFiles, &$files = array())
     {
+        static $length = null;
+        if ($length === null) {
+            $length = strlen(Yii::getAlias($this->rootPath));
+        }
         if (!is_dir($path)) return null;
         if (substr($path, strlen($path) - 1) != '/') $path .= '/';
         $handle = opendir($path);
@@ -363,8 +371,9 @@ class UEditorAction extends Action
                     $this->getfiles($path2, $allowFiles, $files);
                 } else {
                     if (preg_match("/\.(" . $allowFiles . ")$/i", $file)) {
+                        $url = Yii::getAlias($this->rootUrl) . '/' . substr($path2, $length);
                         $files[] = [
-                            'url' => str_replace($this->getRootPath(), $this->getRootUrl(), $path2),
+                            'url' => preg_replace('/\/+/', '/', $url),
                             'mtime' => filemtime($path2)
                         ];
                     }
@@ -372,37 +381,5 @@ class UEditorAction extends Action
             }
         }
         return $files;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRootPath()
-    {
-        return rtrim(Yii::getAlias($this->_rootPath), '\\/');
-    }
-
-    /**
-     * @param string $rootPath
-     */
-    public function setRootPath($rootPath)
-    {
-        $this->_rootPath = $rootPath;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRootUrl()
-    {
-        return rtrim(Yii::getAlias($this->_rootUrl), '\\/');
-    }
-
-    /**
-     * @param string $rootUrl
-     */
-    public function setRootUrl($rootUrl)
-    {
-        $this->_rootUrl = $rootUrl;
     }
 }
