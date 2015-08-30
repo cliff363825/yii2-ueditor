@@ -345,7 +345,7 @@ class Uploader
         $rootUrl = !empty($this->rootUrl) ? $this->rootUrl : '';
         return array(
             "state" => $this->stateInfo,
-            "url" => preg_replace('/\/+/', '/', $rootUrl . $this->fullName),
+            "url" => rtrim($rootUrl, '\\/') . '/' . ltrim($this->fullName, '\\/'),
             "title" => $this->fileName,
             "original" => $this->oriName,
             "type" => $this->fileType,

@@ -371,9 +371,9 @@ class UEditorAction extends Action
                     $this->getfiles($path2, $allowFiles, $files);
                 } else {
                     if (preg_match("/\.(" . $allowFiles . ")$/i", $file)) {
-                        $url = Yii::getAlias($this->rootUrl) . '/' . substr($path2, $length);
+                        $url = rtrim(Yii::getAlias($this->rootUrl), '\\/') . '/' . ltrim(substr($path2, $length), '\\/');
                         $files[] = [
-                            'url' => preg_replace('/\/+/', '/', $url),
+                            'url' => $url,
                             'mtime' => filemtime($path2)
                         ];
                     }
