@@ -14,12 +14,17 @@ class UEditorAction extends Action
      * 文件保存根路径
      * @var string
      */
-    public $rootPath = '@webroot/uploads';
+    public $basePath = '@webroot';
     /**
      * 文件保存根url
      * @var string
      */
-    public $rootUrl = '@web/uploads';
+    public $baseUrl = '@web';
+    /**
+     * 文件保存子目录
+     * @var string
+     */
+    public $savePath = 'uploads';
     /**
      * @var array
      */
@@ -104,8 +109,8 @@ class UEditorAction extends Action
      */
     protected function do_upload()
     {
-        $rootPath = rtrim(Yii::getAlias($this->rootPath), '\\/') . '/';
-        $rootUrl = rtrim(Yii::getAlias($this->rootUrl), '\\/') . '/';
+        $rootPath = rtrim(Yii::getAlias($this->basePath), '\\/') . '/';
+        $rootUrl = rtrim(Yii::getAlias($this->baseUrl), '\\/') . '/';
         $CONFIG = $this->config;
         /* 上传配置 */
         $base64 = "upload";
@@ -195,7 +200,7 @@ class UEditorAction extends Action
         $end = $start + $size;
 
         /* 获取文件列表 */
-        $path = rtrim(Yii::getAlias($this->rootPath), '\\/') . '/' . $path;
+        $path = rtrim(Yii::getAlias($this->basePath), '\\/') . '/' . $path;
         $files = $this->getfiles($path, $allowFiles);
         if (!count($files)) {
             return json_encode([
@@ -232,8 +237,8 @@ class UEditorAction extends Action
      */
     protected function do_crawler()
     {
-        $rootPath = rtrim(Yii::getAlias($this->rootPath), '\\/') . '/';
-        $rootUrl = rtrim(Yii::getAlias($this->rootUrl), '\\/') . '/';
+        $rootPath = rtrim(Yii::getAlias($this->basePath), '\\/') . '/';
+        $rootUrl = rtrim(Yii::getAlias($this->baseUrl), '\\/') . '/';
         $CONFIG = $this->config;
         /* 上传配置 */
         $config = [
@@ -304,44 +309,44 @@ class UEditorAction extends Action
             'imageCompressBorder' => 1600,
             'imageInsertAlign' => 'none',
             'imageUrlPrefix' => '',
-            'imagePathFormat' => '/image/{yyyy}{mm}{dd}/{time}{rand:6}',
+            'imagePathFormat' => rtrim($this->savePath, '\\/') . '/image/{yyyy}{mm}{dd}/{time}{rand:6}',
             'scrawlActionName' => 'uploadscrawl',
             'scrawlFieldName' => 'upfile',
-            'scrawlPathFormat' => '/image/{yyyy}{mm}{dd}/{time}{rand:6}',
+            'scrawlPathFormat' => rtrim($this->savePath, '\\/') . '/image/{yyyy}{mm}{dd}/{time}{rand:6}',
             'scrawlMaxSize' => 2048000,
             'scrawlUrlPrefix' => '',
             'scrawlInsertAlign' => 'none',
             'snapscreenActionName' => 'uploadimage',
-            'snapscreenPathFormat' => '/image/{yyyy}{mm}{dd}/{time}{rand:6}',
+            'snapscreenPathFormat' => rtrim($this->savePath, '\\/') . '/image/{yyyy}{mm}{dd}/{time}{rand:6}',
             'snapscreenUrlPrefix' => '',
             'snapscreenInsertAlign' => 'none',
             'catcherLocalDomain' => ['127.0.0.1', 'localhost', 'img.baidu.com',],
             'catcherActionName' => 'catchimage',
             'catcherFieldName' => 'source',
-            'catcherPathFormat' => '/image/{yyyy}{mm}{dd}/{time}{rand:6}',
+            'catcherPathFormat' => rtrim($this->savePath, '\\/') . '/image/{yyyy}{mm}{dd}/{time}{rand:6}',
             'catcherUrlPrefix' => '',
             'catcherMaxSize' => 2048000,
             'catcherAllowFiles' => ['.png', '.jpg', '.jpeg', '.gif', '.bmp',],
             'videoActionName' => 'uploadvideo',
             'videoFieldName' => 'upfile',
-            'videoPathFormat' => '/video/{yyyy}{mm}{dd}/{time}{rand:6}',
+            'videoPathFormat' => rtrim($this->savePath, '\\/') . '/video/{yyyy}{mm}{dd}/{time}{rand:6}',
             'videoUrlPrefix' => '',
             'videoMaxSize' => 102400000,
             'videoAllowFiles' => ['.flv', '.swf', '.mkv', '.avi', '.rm', '.rmvb', '.mpeg', '.mpg', '.ogg', '.ogv', '.mov', '.wmv', '.mp4', '.webm', '.mp3', '.wav', '.mid',],
             'fileActionName' => 'uploadfile',
             'fileFieldName' => 'upfile',
-            'filePathFormat' => '/file/{yyyy}{mm}{dd}/{time}{rand:6}',
+            'filePathFormat' => rtrim($this->savePath, '\\/') . '/file/{yyyy}{mm}{dd}/{time}{rand:6}',
             'fileUrlPrefix' => '',
             'fileMaxSize' => 51200000,
             'fileAllowFiles' => ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.flv', '.swf', '.mkv', '.avi', '.rm', '.rmvb', '.mpeg', '.mpg', '.ogg', '.ogv', '.mov', '.wmv', '.mp4', '.webm', '.mp3', '.wav', '.mid', '.rar', '.zip', '.tar', '.gz', '.7z', '.bz2', '.cab', '.iso', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.pdf', '.txt', '.md', '.xml',],
             'imageManagerActionName' => 'listimage',
-            'imageManagerListPath' => '/image/',
+            'imageManagerListPath' => rtrim($this->savePath, '\\/') . '/image/',
             'imageManagerListSize' => 20,
             'imageManagerUrlPrefix' => '',
             'imageManagerInsertAlign' => 'none',
             'imageManagerAllowFiles' => ['.png', '.jpg', '.jpeg', '.gif', '.bmp',],
             'fileManagerActionName' => 'listfile',
-            'fileManagerListPath' => '/file/',
+            'fileManagerListPath' => rtrim($this->savePath, '\\/') . '/file/',
             'fileManagerUrlPrefix' => '',
             'fileManagerListSize' => 20,
             'fileManagerAllowFiles' => ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.flv', '.swf', '.mkv', '.avi', '.rm', '.rmvb', '.mpeg', '.mpg', '.ogg', '.ogv', '.mov', '.wmv', '.mp4', '.webm', '.mp3', '.wav', '.mid', '.rar', '.zip', '.tar', '.gz', '.7z', '.bz2', '.cab', '.iso', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.pdf', '.txt', '.md', '.xml',],
@@ -357,10 +362,6 @@ class UEditorAction extends Action
      */
     protected function getfiles($path, $allowFiles, &$files = array())
     {
-        static $length = null;
-        if ($length === null) {
-            $length = strlen(Yii::getAlias($this->rootPath));
-        }
         if (!is_dir($path)) return null;
         if (substr($path, strlen($path) - 1) != '/') $path .= '/';
         $handle = opendir($path);
@@ -371,7 +372,7 @@ class UEditorAction extends Action
                     $this->getfiles($path2, $allowFiles, $files);
                 } else {
                     if (preg_match("/\.(" . $allowFiles . ")$/i", $file)) {
-                        $url = rtrim(Yii::getAlias($this->rootUrl), '\\/') . '/' . ltrim(substr($path2, $length), '\\/');
+                        $url = str_replace(Yii::getAlias($this->basePath), '', $path2);
                         $files[] = [
                             'url' => $url,
                             'mtime' => filemtime($path2)
