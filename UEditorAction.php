@@ -364,6 +364,8 @@ class UEditorAction extends Action
     {
         if (!is_dir($path)) return null;
         if (substr($path, strlen($path) - 1) != '/') $path .= '/';
+        $basePath = Yii::getAlias($this->basePath);
+        $baseUrl = Yii::getAlias($this->baseUrl);
         $handle = opendir($path);
         while (false !== ($file = readdir($handle))) {
             if ($file != '.' && $file != '..') {
@@ -372,7 +374,7 @@ class UEditorAction extends Action
                     $this->getfiles($path2, $allowFiles, $files);
                 } else {
                     if (preg_match("/\.(" . $allowFiles . ")$/i", $file)) {
-                        $url = str_replace(Yii::getAlias($this->basePath), '', $path2);
+                        $url = str_replace($basePath, $baseUrl, $path2);
                         $files[] = [
                             'url' => $url,
                             'mtime' => filemtime($path2)
