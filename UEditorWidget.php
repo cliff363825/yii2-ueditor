@@ -6,6 +6,10 @@ use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\widgets\InputWidget;
 
+/**
+ * Class UEditorWidget
+ * @package cliff363825\ueditor
+ */
 class UEditorWidget extends InputWidget
 {
     /**
@@ -104,6 +108,7 @@ var {$varName} = UE.getEditor('{$id}'," . Json::encode($this->clientOptions) . "
     protected function defaultOptions()
     {
         return [
+            'serverUrl' => '',
             'theme' => self::THEME_DEFAULT,
             'lang' => self::LANG_ZH_CN,
         ];
