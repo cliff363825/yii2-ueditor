@@ -29,6 +29,11 @@ class UEditorAction extends Action
      * @var array
      */
     public $config = [];
+    /**
+     * 文件上传类
+     * @var string
+     */
+    public $uploaderClass = '\cliff363825\ueditor\Uploader';
 
     /**
      * @inheritDoc
@@ -153,7 +158,7 @@ class UEditorAction extends Action
         }
 
         /* 生成上传实例对象并完成上传 */
-        $up = new Uploader($fieldName, $config, $base64, $rootPath, $rootUrl);
+        $up = $this->buildUploader($fieldName, $config, $base64, $rootPath, $rootUrl);
 
         /**
          * 得到上传文件所对应的各个参数,数组结构
@@ -257,7 +262,7 @@ class UEditorAction extends Action
             $source = $_GET[$fieldName];
         }
         foreach ($source as $imgUrl) {
-            $item = new Uploader($imgUrl, $config, "remote", $rootPath, $rootUrl);
+            $item = $this->buildUploader($imgUrl, $config, "remote", $rootPath, $rootUrl);
             $info = $item->getFileInfo();
             array_push($list, [
                 "state" => $info["state"],
@@ -383,5 +388,20 @@ class UEditorAction extends Action
             }
         }
         return $files;
+    }
+
+    /**
+     * 创建文件上传实例
+     * @param string $fieldName
+     * @param array $config
+     * @param string $base64
+     * @param string $rootPath
+     * @param string $rootUrl
+     * @return Uploader
+     */
+    protected function buildUploader($fieldName, $config, $base64, $rootPath, $rootUrl)
+    {
+        $uploaderClass = $this->uploaderClass;
+        return new $uploaderClass($fieldName, $config, $base64, $rootPath, $rootUrl);
     }
 }
