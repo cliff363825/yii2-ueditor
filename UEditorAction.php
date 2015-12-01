@@ -374,9 +374,8 @@ class UEditorAction extends Action
                     $this->getfiles($path2, $allowFiles, $files);
                 } else {
                     if (preg_match("/\.(" . $allowFiles . ")$/i", $file)) {
-                        $url = str_replace($basePath, $baseUrl, $path2);
                         $files[] = [
-                            'url' => $url,
+                            'url' => str_replace($basePath, $baseUrl, $path2),
                             'mtime' => filemtime($path2)
                         ];
                     }
