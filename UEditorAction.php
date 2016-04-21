@@ -49,7 +49,7 @@ class UEditorAction extends Action
      */
     public function run()
     {
-        $action = $_GET['action'];
+        $action = !empty($_GET['action']) ? trim($_GET['action']) : '';
 
         switch ($action) {
             case 'config':
@@ -119,7 +119,7 @@ class UEditorAction extends Action
         $CONFIG = $this->config;
         /* 上传配置 */
         $base64 = "upload";
-        switch (htmlspecialchars($_GET['action'])) {
+        switch ($_GET['action']) {
             case 'uploadimage':
                 $config = [
                     "pathFormat" => $CONFIG['imagePathFormat'],
@@ -206,7 +206,8 @@ class UEditorAction extends Action
 
         /* 获取文件列表 */
         $path = rtrim(Yii::getAlias($this->basePath), '\\/') . '/' . $path;
-        $files = $this->getfiles($path, $allowFiles);
+        $url = rtrim(Yii::getAlias($this->baseUrl), '\\/') . '/' . $path;
+        $files = $this->getfiles($path, $url, $allowFiles);
         if (!count($files)) {
             return json_encode([
                 "state" => "no match file",
@@ -407,28 +408,35 @@ class UEditorAction extends Action
      * @param array $files
      * @return array
      */
-    protected function getfiles($path, $allowFiles, &$files = array())
+    protected function getfiles($path, $url, $allowFiles, &$files = array())
     {
-        if (!is_dir($path)) return null;
-        if (substr($path, strlen($path) - 1) != '/') $path .= '/';
-        $basePath = Yii::getAlias($this->basePath);
-        $baseUrl = Yii::getAlias($this->baseUrl);
+        if (!is_dir($path)) {
+            return null;
+        }
+        $path = rtrim($path, '\\/') . '/';
+        $url = rtrim($url, '\\/') . '/';
         $handle = opendir($path);
+        if (!$handle) {
+            return null;
+        }
         while (false !== ($file = readdir($handle))) {
-            if ($file != '.' && $file != '..') {
-                $path2 = $path . $file;
-                if (is_dir($path2)) {
-                    $this->getfiles($path2, $allowFiles, $files);
-                } else {
-                    if (preg_match("/\.(" . $allowFiles . ")$/i", $file)) {
-                        $files[] = [
-                            'url' => str_replace($basePath, $baseUrl, $path2),
-                            'mtime' => filemtime($path2)
-                        ];
-                    }
+            if ($file == '.' || $file == '..') {
+                continue;
+            }
+            $path2 = $path . $file;
+            $url2 = $url . $file;
+            if (is_dir($path2)) {
+                $this->getfiles($path2, $url2, $allowFiles, $files);
+            } else {
+                if (preg_match("/\.(" . $allowFiles . ")$/i", $file)) {
+                    $files[] = [
+                        'url' => $url2,
+                        'mtime' => filemtime($path2)
+                    ];
                 }
             }
         }
+        closedir($handle);
         return $files;
     }
 
